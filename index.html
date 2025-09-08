@@ -1484,16 +1484,34 @@
       if (e.key === 'Enter') checkPassword();
     });
 
-    // তারিখ ও সময় ফরম্যাটিং ফাংশন (প্লেসহোল্ডার, কাস্টমাইজেশন প্রয়োজন)
-    function getDateFromTimestamp(timestamp) {
-      return new Date().toISOString().split('T')[0];
+    // Timestamp থেকে তারিখ এবং সময় এক্সট্র্যাক্ট করার ফাংশন
+    function parseTimestamp(timestampStr) {
+      try {
+        // Parse the timestamp string to Date object
+        const date = new Date(timestampStr);
+        if (isNaN(date.getTime())) {
+          throw new Error('Invalid date');
+        }
+        return date;
+      } catch (error) {
+        console.error('Timestamp parse error:', error);
+        return new Date(); // Fallback to current date if invalid
+      }
     }
 
-    function getTimeFromTimestamp(timestamp) {
-      const now = new Date();
-      const hours = now.getHours() % 12 || 12;
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const period = now.getHours() >= 12 ? 'PM' : 'AM';
+    function getDateFromTimestamp(timestampStr) {
+      const date = parseTimestamp(timestampStr);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function getTimeFromTimestamp(timestampStr) {
+      const date = parseTimestamp(timestampStr);
+      const hours = date.getHours() % 12 || 12;
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const period = date.getHours() >= 12 ? 'PM' : 'AM';
       return `${hours}:${minutes} ${period}`;
     }
 
@@ -1525,7 +1543,7 @@
       }
     }
 
-    // ডেটা নরমালাইজ (প্লেসহোল্ডার)
+    // ডেটা নরমালাইজ (এখন timestamp থেকে সঠিক তারিখ/সময় নেয়)
     function normalizeRow(row, index) {
       return {
         subject: findBestMatchingSubject(row.subject || 'Unknown'),
@@ -1533,6 +1551,7 @@
         title: row.title || 'ক্লাস', // Ensure title is always present
         date: getDateFromTimestamp(row.timestamp),
         time: getTimeFromTimestamp(row.timestamp),
+        timestampObj: parseTimestamp(row.timestamp), // Store parsed Date for sorting
         serial: index + 1
       };
     }
@@ -1574,7 +1593,7 @@
 
     // আজকের ক্লাস ফিল্টার
     function filterTodayClasses(classes) {
-      const today = getDateFromTimestamp();
+      const today = getDateFromTimestamp(new Date().toString()); // Current date as string
       return classes.filter(cls => cls && cls.date === today);
     }
 
@@ -1599,11 +1618,11 @@
       container.innerHTML = tableHTML;
     }
 
-    // সময় অনুযায়ী সাজানো
+    // সময় অনুযায়ী সাজানো (timestampObj ব্যবহার করে)
     function sortByTime(rows, order = 'desc') {
       return rows.slice().sort((a, b) => {
-        const timeA = new Date(a.date).getTime();
-        const timeB = new Date(b.date).getTime();
+        const timeA = a.timestampObj.getTime();
+        const timeB = b.timestampObj.getTime();
         return order === 'asc' ? timeA - timeB : timeB - timeA;
       });
     }
