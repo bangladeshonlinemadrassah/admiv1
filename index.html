@@ -1,8 +1,42 @@
-<form 
-  method="POST" 
-  https://script.google.com/macros/s/AKfycbx_n3M6PjTNY4CEAg_cCp3eCZ9uDrRTo0dHv1kPCs0O3TG2ivY-a_wQINznNJBpwJUW/exec"
->
-  <input name="Email" type="email" placeholder="Email" required>
-  <input name="Name" type="text" placeholder="Name" required>
-  <button type="submit">Send</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Submission</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <form id="submissionForm">
+        <label for="Name">নাম:</label>
+        <input type="text" id="Name" name="Name" required><br><br>
+        <label for="Batch">ব্যাচ:</label>
+        <input type="text" id="Batch" name="Batch" required><br><br>
+        <label for="Message">বার্তা:</label>
+        <textarea id="Message" name="Message" required></textarea><br><br>
+        <button type="submit">জমা দিন</button>
+    </form>
+
+    <script>
+        const url = 'https://script.google.com/macros/s/YourScriptID/exec'; // আপনার ওয়েব অ্যাপ URL
+
+        document.getElementById('submissionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById('submissionForm'));
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                alert('জমা সফল: ' + JSON.stringify(data));
+            })
+            .catch(error => {
+                alert('জমা ব্যর্থ: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>
