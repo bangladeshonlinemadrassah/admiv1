@@ -2295,8 +2295,8 @@ window.trackItem = function(id, type) {
     const scrollListener = () => { scrolled = true; };
     window.addEventListener('scroll', scrollListener);
 
-    const minTime = 7; // seconds
-    const maxTime = 7 * 60; // 7 minutes in seconds
+    const minTime = 0; // seconds
+    const maxTime = 0; // 7 minutes in seconds
     const randomTime = Math.random() * (maxTime - minTime) + minTime;
 
     setTimeout(() => {
